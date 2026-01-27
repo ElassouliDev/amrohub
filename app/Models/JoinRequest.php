@@ -16,9 +16,10 @@ class JoinRequest extends Model
         'email',
         'phone',
         'gender',
+        'type',
         'university',
         'specialization',
-        'student_id',
+        'university_id',
         'status',
     ];
 

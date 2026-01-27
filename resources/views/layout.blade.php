@@ -19,7 +19,6 @@
             </nav>
         </header>
 
-        "C:\laragon\bin\php\php-8.2.30-nts-Win32-vs16-x64\php.exe" "C:\ProgramData\ComposerSetup\bin\composer.phar" update
         <main>
             @if(session('success'))
                 <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
