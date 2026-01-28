@@ -36,10 +36,10 @@ class CustomersTable
                     ->badge(),
                 IconColumn::make('account_status')
                     ->boolean(),
-                ImageColumn::make('id_image_path'),
-                TextColumn::make('plan_id')
-                    ->numeric()
-                    ->sortable(),
+                // ImageColumn::make('id_image_path'),
+                // TextColumn::make('plan_id')
+                //     ->numeric()
+                //     ->sortable(),
                 TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()

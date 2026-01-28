@@ -19,6 +19,7 @@ class CustomerForm
                 TextInput::make('email')
                     ->label('Email address')
                     ->email()
+                    ->unique()
                     ->required(),
                 TextInput::make('phone')
                     ->tel(),
