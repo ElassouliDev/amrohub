@@ -37,4 +37,9 @@ class Customer extends Model
     {
         return $this->belongsTo(Plan::class);
     }
+
+    public function customerPlans()
+    {
+        return $this->hasMany(CustomerPlan::class);
+    }
 }

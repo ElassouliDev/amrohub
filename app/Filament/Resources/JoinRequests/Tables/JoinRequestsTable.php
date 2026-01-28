@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\JoinRequests\Tables;
 
+use App\Models\Customer;
 use App\Models\JoinRequest;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -17,6 +18,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
+
 class JoinRequestsTable
 {
     public static function configure(Table $table): Table
@@ -35,14 +37,14 @@ class JoinRequestsTable
                     ->searchable(),
                 TextColumn::make('gender')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'female' => 'warning',
                         'male' => 'info',
                     }),
                 TextColumn::make('type')
                     ->badge()
 
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         'student' => 'gray',
                         'teacher' => 'info',
                     }),
@@ -53,7 +55,7 @@ class JoinRequestsTable
                 TextColumn::make('university_id')
                     ->searchable(),
                 TextColumn::make('status')
-                    ->badge()->color(fn (string $state): string => match ($state) {
+                    ->badge()->color(fn(string $state): string => match ($state) {
                         'pending' => 'warning',
                         'approved' => 'success',
                         'rejected' => 'danger',
@@ -73,48 +75,82 @@ class JoinRequestsTable
             ])
             ->filters([
                 SelectFilter::make('status')
-                ->multiple()
-                ->options([
-                    'pending' => 'Pending',
-                    'approved' => 'Approved',
-                    'rejected' => 'Rejected',
-                ]),
+                    ->multiple()
+                    ->options([
+                        'pending' => 'Pending',
+                        'approved' => 'Approved',
+                        'rejected' => 'Rejected',
+                    ]),
 
                 SelectFilter::make('gender')
-                ->multiple()
-                ->options([
-                    'male' => 'Male',
-                    'female' => 'Female',
-                ]),
+                    ->multiple()
+                    ->options([
+                        'male' => 'Male',
+                        'female' => 'Female',
+                    ]),
                 SelectFilter::make('type')
-                ->multiple()
-                ->options([
-                    'student' => 'Student',
-                    'teacher' => 'Teacher',
-                ]),
+                    ->multiple()
+                    ->options([
+                        'student' => 'Student',
+                        'teacher' => 'Teacher',
+                    ]),
 
             ])
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
                 Action::make('updateStatus')
-                ->schema([
-                    Select::make('status')
-                        ->label('Status')
-                        ->options([
-                            'pending' => 'Pending',
-                            'approved' => 'Approved',
-                            'rejected' => 'Rejected',
-                        ])
-                        ->required(),
-                ])
-                ->action(function (array $data, JoinRequest $record): void {
-                    $record->status = $data['status'];
-                    $record->save();
-                })    ->icon(Heroicon::OutlinedPencilSquare)
+                    ->schema([
+                        Select::make('status')
+                            ->label('Status')
+                            ->options([
+                                'pending' => 'Pending',
+                                'approved' => 'Approved',
+                                'rejected' => 'Rejected',
+                            ])
+                            ->required(),
+                    ])
+                    ->action(function (array $data, JoinRequest $record): void {
+                        $record->status = $data['status'];
+                        $record->save();
+
+                        if ($record->status === 'approved') {
+                            $customer = Customer::firstOrCreate(
+                                [
+                                    'email' => $record->email,
+                                ],
+                                [
+                                    'name' => $record->name,
+                                    'phone' => $record->phone,
+                                    'gender' => $record->gender,
+                                    'university' => $record->university,
+                                    'specialization' => $record->specialization,
+                                    'university_id' => $record->university_id,
+                                    'user_type' => $record->type,
+                                    'account_status' => true,
+                                    'id_image_path' => $record->id_image_path,
+                                    'plan_id' => $record->plan_id,
+                                ]
+                            );
+
+                            if ($customer->wasRecentlyCreated) {
+                                $customer->customerPlans()->create([
+                                    'plan_id' => $record->plan_id,
+                                    'start_date' => $record->start_date,
+                                    'end_date' => $record->end_date,
+                                    'status' => 'active',
+                                    "uuid" => "{$record->plan_id}_{$record->id}_" . now()->getTimestamp(),
+                                ]);
+                            }
 
 
-                    ->visible(fn (JoinRequest $record): bool => $record->status === "pending"),
+
+                            $record->delete();
+                        }
+                    })->icon(Heroicon::OutlinedPencilSquare)
+
+
+                    ->visible(fn(JoinRequest $record): bool => $record->status === "pending"),
 
             ])
             ->toolbarActions([
