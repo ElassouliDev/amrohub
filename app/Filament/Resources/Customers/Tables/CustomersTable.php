@@ -2,9 +2,12 @@
 
 namespace App\Filament\Resources\Customers\Tables;
 
+use App\Filament\Exports\CustomerExporter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ExportAction;
+use Filament\Actions\ExportBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
@@ -60,9 +63,16 @@ class CustomersTable
                 ViewAction::make(),
                 EditAction::make(),
             ])
+            ->headerActions([
+
+                ExportAction::make('export')
+                    ->exporter(CustomerExporter::class)
+            ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
+                    ExportBulkAction::make('export')->exporter(CustomerExporter::class)
+
                 ]),
             ]);
     }
