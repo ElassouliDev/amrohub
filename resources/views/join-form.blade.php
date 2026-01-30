@@ -96,7 +96,7 @@
                 </ul>
             </div>
         @endif
-        <form class="space-y-4" method="post" action="{{route('join-requests.store')}}">
+        <form  class="space-y-4 storeForm" method="post" action="{{route('join-requests.store')}}">
 
             @csrf
             <!-- الاسم الكامل -->
@@ -234,8 +234,8 @@
             <!-- زر الإرسال -->
             <button
                 type="submit"
-                class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
-            >
+                class="disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-75 sentBtn w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
+             >
                 إرسال الطلب
             </button>
 
@@ -243,6 +243,16 @@
     </div>
 </div>
 
+    <script src="https://code.jquery.com/jquery-4.0.0.slim.min.js" integrity="sha256-8DGpv13HIm+5iDNWw1XqxgFB4mj+yOKFNb+tHBZOowc=" crossorigin="anonymous"></script>
 
+<script>
+
+
+    $(document).on('submit' , '.storeForm',function (){
+        $('.sentBtn').attr('disabled',"disabled")
+
+    })
+
+</script>
 </body>
 </html>

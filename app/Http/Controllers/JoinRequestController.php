@@ -23,7 +23,7 @@ class JoinRequestController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
+            'email' => 'required|email|max:255|unique:join_requests',
             'phone' => 'required|string|max:10',
             'gender' => 'required|in:male,female',
             'type' => 'required|in:student,teacher',

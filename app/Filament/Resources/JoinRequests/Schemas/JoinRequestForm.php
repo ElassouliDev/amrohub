@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\JoinRequests\Schemas;
 
+use App\Models\JoinRequest;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -32,6 +33,7 @@ class JoinRequestForm
                 Select::make('status')
                     ->options(['pending' => 'Pending', 'approved' => 'Approved', 'rejected' => 'Rejected'])
                     ->default('pending')
+                    ->visible(fn (JoinRequest $record): bool => $record->status==='pending')
                     ->required(),
             ]);
     }

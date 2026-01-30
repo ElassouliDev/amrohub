@@ -2,11 +2,14 @@
 
 namespace App\Filament\Resources\JoinRequests\Tables;
 
+use App\Filament\Exports\JoinRequestExporter;
 use App\Models\Customer;
 use App\Models\JoinRequest;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ExportAction;
+use Filament\Actions\ExportBulkAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
@@ -18,6 +21,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
+use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 
 class JoinRequestsTable
 {
@@ -74,6 +78,8 @@ class JoinRequestsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                DateRangeFilter::make('created_at'),
+
                 SelectFilter::make('status')
                     ->multiple()
                     ->options([
@@ -95,6 +101,9 @@ class JoinRequestsTable
                         'teacher' => 'Teacher',
                     ]),
 
+            ])
+            ->headerActions([
+                ExportAction::make()->exporter(JoinRequestExporter::class)
             ])
             ->recordActions([
                 ViewAction::make(),
@@ -145,7 +154,7 @@ class JoinRequestsTable
 
 
 
-                            $record->delete();
+//                            $record->delete();
                         }
                     })->icon(Heroicon::OutlinedPencilSquare)
 
@@ -155,6 +164,7 @@ class JoinRequestsTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    ExportBulkAction::make()->exporter(JoinRequestExporter::class)
                     //DeleteBulkAction::make(),
                     //ForceDeleteBulkAction::make(),
                     //RestoreBulkAction::make(),

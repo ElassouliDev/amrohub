@@ -62,7 +62,7 @@ class EditJoinRequest extends EditRecord
                 ]);
             }
 
-            $record->delete();
+//            $record->delete();
         }
 
         return $record;
