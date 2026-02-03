@@ -33,37 +33,8 @@ class EditJoinRequest extends EditRecord
 
         $record->update($data);
 
-        if ($record->status === 'approved') {
-            $customer = Customer::firstOrCreate(
-                [
-                    'email' => $record->email,
-                ],
-                [
-                    'name' => $record->name,
-                    'phone' => $record->phone,
-                    'gender' => $record->gender,
-                    'university' => $record->university,
-                    'specialization' => $record->specialization,
-                    'university_id' => $record->university_id,
-                    'user_type' => $record->type,
-                    'account_status' => true,
-                    'id_image_path' => $record->id_image_path,
-                    'plan_id' => $record->plan_id,
-                ]
-            );
+        JoinRequestResource::acceptRequest($record);
 
-            if ($customer->wasRecentlyCreated) {
-                $customer->customerPlans()->create([
-                    'plan_id' => $record->plan_id,
-                    'start_date' => $record->start_date,
-                    'end_date' => $record->end_date,
-                    'status' => 'active',
-                    "uuid" => "{$record->plan_id}_{$record->id}_" . now()->getTimestamp(),
-                ]);
-            }
-
-            $record->delete();
-        }
 
         return $record;
     }

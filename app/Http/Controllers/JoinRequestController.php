@@ -4,16 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\JoinRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 
 class JoinRequestController extends Controller
 {
+    public function __construct()
+    {
+        App::setLocale('ar');
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $joinRequests = JoinRequest::with('plan')->latest()->get();
-        return view('join_requests.index', compact('joinRequests'));
+        return view('join-form');
     }
 
     /**
@@ -44,30 +49,5 @@ class JoinRequestController extends Controller
         return response()->json([
             'message' => 'تمّ تسجيل طلبك بنجاح، الرجاء التوجّه إلى مساحة العمل للاستفادة من الخدمة.',
         ], 201);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, JoinRequest $joinRequest)
-    {
-        $validated = $request->validate([
-            'status' => 'required|in:pending,approved,rejected',
-        ]);
-
-        $joinRequest->update($validated);
-
-        // TODO: If status is approved, logic to create User and UserPlan could be added here.
-
-        return redirect()->route('join-requests.index')->with('success', 'Request updated successfully.');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(JoinRequest $joinRequest)
-    {
-        $joinRequest->delete();
-        return redirect()->route('join-requests.index')->with('success', 'Request deleted successfully.');
     }
 }

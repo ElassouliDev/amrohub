@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\JoinRequests\Tables;
 
 use App\Filament\Exports\JoinRequestExporter;
+use App\Filament\Resources\JoinRequests\JoinRequestResource;
 use App\Models\Customer;
 use App\Models\JoinRequest;
 use Filament\Actions\BulkAction;
@@ -185,45 +186,12 @@ class JoinRequestsTable
                                 $record->status = $data['status'];
                                 $record->save();
 
-                                if ($record->status === 'approved') {
-                                    $customer = Customer::firstOrCreate(
-                                        [
-                                            'email' => $record->email,
-                                        ],
-                                        [
-                                            'name' => $record->name,
-                                            'phone' => $record->phone,
-                                            'gender' => $record->gender,
-                                            'university' => $record->university,
-                                            'specialization' => $record->specialization,
-                                            'university_id' => $record->university_id,
-                                            'user_type' => $record->type,
-                                            'account_status' => true,
-                                            'id_image_path' => $record->id_image_path,
-                                            'plan_id' => $record->plan_id,
-                                        ]
-                                    );
-
-                                    if ($customer->wasRecentlyCreated) {
-                                        $customer->customerPlans()->create([
-                                            'plan_id' => $record->plan_id,
-                                            'start_date' => $record->start_date,
-                                            'end_date' => $record->end_date,
-                                            'status' => 'active',
-                                            "uuid" => "{$record->plan_id}_{$record->id}_" . now()->getTimestamp(),
-                                        ]);
-                                    }
-
-
-
-                                    $record->delete();
-                                }
+                                JoinRequestResource::acceptRequest($record);
                             });
-
                         })->icon(Heroicon::OutlinedPencilSquare)
 
-//                    ForceDeleteBulkAction::make(),
-//                    RestoreBulkAction::make(),
+                    //                    ForceDeleteBulkAction::make(),
+                    //                    RestoreBulkAction::make(),
                 ]),
             ]);
     }

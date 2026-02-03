@@ -10,7 +10,7 @@ class UsageLog extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
+        'customer_id',
         'plan_id',
         'start_time',
         'end_time',
@@ -22,9 +22,16 @@ class UsageLog extends Model
         'end_time' => 'datetime',
     ];
 
-    public function user()
+
+
+
+    public function customer()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Customer::class);
+    }
+    public function customerPlan()
+    {
+        return $this->belongsTo(CustomerPlan::class);
     }
 
     public function plan()
