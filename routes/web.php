@@ -6,6 +6,7 @@ use App\Http\Controllers\JoinRequestController;
 use App\Http\Controllers\UsageLogController;
 use App\Models\UsageLog;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Artisan;
 
 use function Symfony\Component\Clock\now;
 
@@ -53,9 +54,10 @@ Route::get('scan/{uuid}', function ($uuid) {
 
     if ($usageLog) {
 
+        $duration = abs(Carbon::now()->diffInMinutes($usageLog->start_time));
         $usageLog->update([
             'end_time' => now(),
-            'duration' => today()->diffInMinutes($usageLog->start_time) >= 20 ? 20 : today()->diffInMinutes($usageLog->start_time),
+            'duration' => $duration >= 20 ? 20 : $duration,
         ]);
 
         return view('scan', [
@@ -80,6 +82,12 @@ Route::get('scan/{uuid}', function ($uuid) {
 
 
 Route::get('test/store-approved', function () {
+
+
+    Artisan::call("migrate");
+
+
+    dd("Success");
 
     //    $records= \App\Models\JoinRequest::where('status','approved')->get();
     //
