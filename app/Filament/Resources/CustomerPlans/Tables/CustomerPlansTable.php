@@ -28,16 +28,22 @@ class CustomerPlansTable
 
                 TextColumn::make("uuid")
                     ->label("Qr Code")->formatStateUsing(function ($state) {
-                        return new HtmlString(static::generateQrCode($state, 100));
+                        return  static::generateQrCode($state, 50);
                     }),
                 TextColumn::make('customer.name')
                     ->searchable(),
                 TextColumn::make('plan.title')
                     ->searchable(),
-                // TextColumn::make('end_date')
-                //     ->dateTime()
-                //     ->sortable()
-                //     ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('start_date')
+                    ->dateTime()
+                    ->sortable(),
+                TextColumn::make('end_date')
+                    ->dateTime()
+                    ->sortable(),
+                TextColumn::make('daily_limit')
+                    ->searchable(),
+                TextColumn::make('weekly_limit')
+                    ->searchable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable(),

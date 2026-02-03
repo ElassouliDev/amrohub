@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\JoinRequestController;
 use App\Http\Controllers\UsageLogController;
 use App\Models\UsageLog;
+use Carbon\Carbon;
+
+use function Symfony\Component\Clock\now;
 
 Route::view('/', 'home');
 
@@ -15,21 +18,64 @@ Route::post('join', [JoinRequestController::class, 'store'])->name('join-request
 
 
 Route::get('scan/{uuid}', function ($uuid) {
-    $customerPlan = \App\Models\CustomerPlan::where('uuid', $uuid)->first();
-    if (!$customerPlan) {
-        abort(404);
+    $customerPlan = \App\Models\CustomerPlan::where('uuid', $uuid)->firstOrFail();
+
+
+
+    if ($customerPlan->daily_limit > 0) {
+
+        $usedMinutesToday = UsageLog::where('customer_plan_id', $customerPlan->id)
+            ->whereDate('created_at', today())->sum('duration');
+
+        if ($usedMinutesToday >= $customerPlan->daily_limit) {
+            abort(403, 'لقد تجاوزت الحد الأقصى للدقائق المسموحة في اليوم');
+        }
+    }
+
+
+    if ($customerPlan->weekly_limit > 0) {
+
+        $usedMinutesWeek = UsageLog::where('customer_plan_id', $customerPlan->id)
+            ->whereDate('created_at', '>=', today()->startOfWeek(Carbon::SATURDAY))->sum('duration');
+
+        if ($usedMinutesWeek >= $customerPlan->weekly_limit) {
+            abort(403, 'لقد تجاوزت الحد الأقصى للدقائق المسموحة في الأسبوع');
+        }
+    }
+
+
+
+
+    $usageLog = UsageLog::where('customer_plan_id', $customerPlan->id)
+        ->whereNull('end_time')
+        ->whereDate('created_at', ">=", today())
+        ->first();
+
+    if ($usageLog) {
+
+        $usageLog->update([
+            'end_time' => now(),
+            'duration' => today()->diffInMinutes($usageLog->start_time) >= 20 ? 20 : today()->diffInMinutes($usageLog->start_time),
+        ]);
+
+        return view('scan', [
+            'message' => 'تم تسجيل الخروج بنجاح',
+            'is_login' => false,
+        ]);
     }
 
     UsageLog::create([
         'customer_id' => $customerPlan->customer_id,
         'plan_id' => $customerPlan->plan_id,
-        'start_date' => $customerPlan->start_date,
-        'end_date' => $customerPlan->end_date,
-        'status' => 'active',
-        "uuid" => "{$customerPlan->plan_id}_{$customerPlan->id}_" . now()->getTimestamp(),
+        'customer_plan_id' => $customerPlan->id,
+        'start_time' => now(),
+        //  'end_date' => $customerPlan->end_date,
     ]);
 
-    return view('scan', compact('customerPlan'));
+    return view('scan', [
+        'message' => 'تم تسجيل الدخول بنجاح',
+        'is_login' => true,
+    ]);
 })->name('scan');
 
 

@@ -7,9 +7,8 @@
 
     <title>توفير مساحة عمل مجانية
         في عمرو هب</title>
-    <meta name="description" content="تبرّع من أكاديميين من الخارج لتوفير ساعات عمل مجانية
-مخصّصة للطلاب الجامعيين والأكاديميين عبر عمرو هب.
- ">
+    <meta name="description" content="حملة توفير ساعات مجانية لطلبة الجامعات وأعضاء هيئة التدريس">
+
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
 

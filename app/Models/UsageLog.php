@@ -12,6 +12,7 @@ class UsageLog extends Model
     protected $fillable = [
         'customer_id',
         'plan_id',
+        "customer_plan_id",
         'start_time',
         'end_time',
         'duration',
@@ -20,6 +21,10 @@ class UsageLog extends Model
     protected $casts = [
         'start_time' => 'datetime',
         'end_time' => 'datetime',
+        "customer_plan_id" => "integer",
+        "customer_id" => "integer",
+        "plan_id" => "integer",
+        "duration" => "integer",
     ];
 
 

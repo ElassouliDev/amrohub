@@ -95,6 +95,8 @@ class JoinRequestResource extends Resource
                     'start_date' => $record->start_date,
                     'end_date' => $record->end_date,
                     'status' => 'active',
+                    'daily_limit' => $record->plan->daily_limit ?: 0,
+                    'weekly_limit' => $record->plan->weekly_limit ?: 0,
                     "uuid" => "{$record->plan_id}_{$record->id}_" . now()->getTimestamp(),
                 ]);
             }

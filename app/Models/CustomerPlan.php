@@ -12,7 +12,17 @@ class CustomerPlan extends Model
         'start_date',
         'end_date',
         'status',
+        'daily_limit',
+        'weekly_limit',
         'uuid',
+    ];
+    protected $casts = [
+        'customer_id' => 'integer',
+        'plan_id' => 'integer',
+        'daily_limit' => 'integer', //in minutes
+        'weekly_limit' => 'integer', //in minutes
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
     ];
 
     public function customer()

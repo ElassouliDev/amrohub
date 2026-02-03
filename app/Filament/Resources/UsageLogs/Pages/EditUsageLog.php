@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Filament\Resources\UsageLogs\Pages;
+
+use App\Filament\Resources\UsageLogs\UsageLogResource;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ViewAction;
+use Filament\Resources\Pages\EditRecord;
+
+class EditUsageLog extends EditRecord
+{
+    protected static string $resource = UsageLogResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            ViewAction::make(),
+            DeleteAction::make(),
+        ];
+    }
+
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        if ($data['end_time'])
+            $data['duration'] = $data['end_time']->diffInMinutes($data['start_time']);
+
+        return $data;
+    }
+}
