@@ -5,6 +5,7 @@ namespace App\Filament\Resources\JoinRequests\Tables;
 use App\Filament\Exports\JoinRequestExporter;
 use App\Models\Customer;
 use App\Models\JoinRequest;
+use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -154,7 +155,7 @@ class JoinRequestsTable
 
 
 
-//                            $record->delete();
+                            $record->delete();
                         }
                     })->icon(Heroicon::OutlinedPencilSquare)
 
@@ -164,10 +165,65 @@ class JoinRequestsTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    ExportBulkAction::make()->exporter(JoinRequestExporter::class)
-                    //DeleteBulkAction::make(),
-                    //ForceDeleteBulkAction::make(),
-                    //RestoreBulkAction::make(),
+                    ExportBulkAction::make()->exporter(JoinRequestExporter::class),
+                    DeleteBulkAction::make(),
+                    BulkAction::make('updateStatus')
+                        ->label('Update Status')
+                        ->schema([
+                            Select::make('status')
+                                ->label('Status')
+                                ->options([
+                                    'pending' => 'Pending',
+                                    'approved' => 'Approved',
+                                    'rejected' => 'Rejected',
+                                ])
+                                ->required(),
+                        ])
+                        ->action(function (array $data,  $records): void {
+                            $records->each(function ($record) use ($data) {
+
+                                $record->status = $data['status'];
+                                $record->save();
+
+                                if ($record->status === 'approved') {
+                                    $customer = Customer::firstOrCreate(
+                                        [
+                                            'email' => $record->email,
+                                        ],
+                                        [
+                                            'name' => $record->name,
+                                            'phone' => $record->phone,
+                                            'gender' => $record->gender,
+                                            'university' => $record->university,
+                                            'specialization' => $record->specialization,
+                                            'university_id' => $record->university_id,
+                                            'user_type' => $record->type,
+                                            'account_status' => true,
+                                            'id_image_path' => $record->id_image_path,
+                                            'plan_id' => $record->plan_id,
+                                        ]
+                                    );
+
+                                    if ($customer->wasRecentlyCreated) {
+                                        $customer->customerPlans()->create([
+                                            'plan_id' => $record->plan_id,
+                                            'start_date' => $record->start_date,
+                                            'end_date' => $record->end_date,
+                                            'status' => 'active',
+                                            "uuid" => "{$record->plan_id}_{$record->id}_" . now()->getTimestamp(),
+                                        ]);
+                                    }
+
+
+
+                                    $record->delete();
+                                }
+                            });
+
+                        })->icon(Heroicon::OutlinedPencilSquare)
+
+//                    ForceDeleteBulkAction::make(),
+//                    RestoreBulkAction::make(),
                 ]),
             ]);
     }

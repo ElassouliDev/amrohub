@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('customer_plans', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('uuid')->unique();
+            $table->string('uuid')->unique();
             $table->foreignId('customer_id')->constrained()->onDelete('cascade');
             $table->foreignId('plan_id')->constrained()->onDelete('cascade');
             $table->integer('remaining_hours')->default(0);

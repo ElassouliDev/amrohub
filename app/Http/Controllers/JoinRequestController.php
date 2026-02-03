@@ -21,6 +21,11 @@ class JoinRequestController extends Controller
      */
     public function store(Request $request)
     {
+        if (!$request->ajax()) {
+            return response()->json([
+                'message' => 'Invalid request',
+            ], 400);
+        }
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:join_requests',
@@ -30,14 +35,15 @@ class JoinRequestController extends Controller
             'university' => 'required|string|max:255',
             'specialization' => 'required|string|max:255',
             'university_id' => 'required|string|max:50',
-//            'plan_id' => 'nullable|exists:plans,id',
+            //            'plan_id' => 'nullable|exists:plans,id',
         ]);
-        $validated['plan_id'] =1;
+        $validated['plan_id'] = 1;
 
 
         JoinRequest::create($validated);
-
-        return redirect()->back()->with('success', 'تمّ تسجيل طلبك بنجاح، الرجاء التوجّه إلى مساحة العمل للاستفادة من الخدمة.');
+        return response()->json([
+            'message' => 'تمّ تسجيل طلبك بنجاح، الرجاء التوجّه إلى مساحة العمل للاستفادة من الخدمة.',
+        ], 201);
     }
 
     /**
