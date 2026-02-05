@@ -57,7 +57,7 @@ Route::get('scan/{uuid}', function ($uuid) {
         $duration = abs(Carbon::now()->diffInMinutes($usageLog->start_time));
         $usageLog->update([
             'end_time' => now(),
-            'duration' => $duration >= 20 ? 20 : $duration,
+            'duration' => $duration >= 20 ? $duration : 20,
         ]);
 
         return view('scan', [
@@ -82,52 +82,19 @@ Route::get('scan/{uuid}', function ($uuid) {
 
 
 Route::get('test/store-approved', function () {
-
-
     Artisan::call("migrate");
+
+
+
+    \App\Models\CustomerPlan::where('id',"<>",0)->update([
+        'daily_limit' => 120,
+        'weekly_limit' => 240,
+    ]);
+
 
 
     dd("Success");
 
-    //    $records= \App\Models\JoinRequest::where('status','approved')->get();
-    //
-    //    foreach($records as $record){
-    //
-    //        if ($record->status === 'approved') {
-    //            $customer = Customer::firstOrCreate(
-    //                [
-    //                    'email' => $record->email,
-    //                ],
-    //                [
-    //                    'name' => $record->name,
-    //                    'phone' => $record->phone,
-    //                    'gender' => $record->gender,
-    //                    'university' => $record->university,
-    //                    'specialization' => $record->specialization,
-    //                    'university_id' => $record->university_id,
-    //                    'user_type' => $record->type?:"student",
-    //                    'account_status' => true,
-    //                    'id_image_path' => $record->id_image_path,
-    //                    'plan_id' => $record->plan_id,
-    //                ]
-    //            );
-    //
-    //            if ($customer->wasRecentlyCreated) {
-    //                $customer->customerPlans()->create([
-    //                    'plan_id' => $record->plan_id,
-    //                    'start_date' => $record->start_date,
-    //                    'end_date' => $record->end_date,
-    //                    'status' => 'active',
-    //                    "uuid" => "{$record->plan_id}_{$record->id}_" . now()->getTimestamp(),
-    //                ]);
-    //            }
-    //
-    //
-    //
-    //            $record->delete();
-    //        }
-    //
-    //        }
 
 });
 

@@ -22,8 +22,11 @@ class EditUsageLog extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        if ($data['end_time'])
+        if ($data['end_time']){
             $data['duration'] = abs(Carbon::parse($data['end_time'])->diffInMinutes(Carbon::parse($data['start_time'])));
+            $data['duration'] = $data['duration']>=20?$data['duration']:20;
+        }
+
 
         return $data;
     }
