@@ -8,7 +8,6 @@ use App\Models\UsageLog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Artisan;
 
-use function Symfony\Component\Clock\now;
 
 Route::view('/', 'home');
 
